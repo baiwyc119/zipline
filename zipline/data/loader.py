@@ -22,8 +22,9 @@ import pytz
 from six import iteritems
 from six.moves.urllib_error import HTTPError
 
-from .benchmarks import get_benchmark_returns
-from . import treasuries, treasuries_can
+import benchmarks
+import benchmarks_cn
+from . import treasuries, treasuries_can,treasuries_cn
 from ..utils.paths import (
     cache_root,
     data_root,
@@ -41,6 +42,7 @@ INDEX_MAPPING = {
     (treasuries_can, 'treasury_curves_can.csv', 'bankofcanada.ca'),
     '^FTSE':  # use US treasuries until UK bonds implemented
     (treasuries, 'treasury_curves.csv', 'www.federalreserve.gov'),
+    'CHINAT':(treasuries_cn, 'cn_treasury_curves.csv','http://yield.chinabond.com.cn/cbweb-mn'),
 }
 
 ONE_HOUR = pd.Timedelta(hours=1)
@@ -85,6 +87,8 @@ def has_data_for_dates(series_or_df, first_date, last_date):
     last_date?
     """
     dts = series_or_df.index
+
+    print dts
     if not isinstance(dts, pd.DatetimeIndex):
         raise TypeError("Expected a DatetimeIndex, but got %s." % type(dts))
     first, last = dts[[0, -1]]
@@ -132,9 +136,9 @@ def load_market_data(trading_day=None, trading_days=None, bm_symbol='SPY',
     '1year','2year','3year','5year','7year','10year','20year','30year'
     """
     if trading_day is None:
-        trading_day = get_calendar('NYSE').trading_day
+        trading_day = get_calendar('SHSZ').trading_day
     if trading_days is None:
-        trading_days = get_calendar('NYSE').all_sessions
+        trading_days = get_calendar('SHSZ').all_sessions
 
     first_date = trading_days[0]
     now = pd.Timestamp.utcnow()
@@ -208,6 +212,8 @@ def ensure_benchmark_data(symbol, first_date, last_date, now, trading_day,
     path.
     """
     filename = get_benchmark_filename(symbol)
+
+    print filename
     data = _load_cached_data(filename, first_date, last_date, now, 'benchmark',
                              environ)
     if data is not None:
@@ -224,12 +230,21 @@ def ensure_benchmark_data(symbol, first_date, last_date, now, trading_day,
     )
 
     try:
-        data = get_benchmark_returns(
-            symbol,
-            first_date - trading_day,
-            last_date,
-        )
-        data.to_csv(get_data_filepath(filename, environ))
+        if (symbol == '000001.SS') :
+            data = benchmarks_cn.get_benchmark_returns(
+                symbol,
+                first_date - trading_day,
+                last_date,
+            )
+            data.to_csv(get_data_filepath(filename, environ))
+        else :
+            data = benchmarks.get_benchmark_returns(
+                symbol,
+                first_date - trading_day,
+                last_date,
+            )
+            data.to_csv(get_data_filepath(filename, environ))
+
     except (OSError, IOError, HTTPError):
         logger.exception('Failed to cache the new benchmark returns')
         raise
@@ -271,9 +286,14 @@ def ensure_treasury_data(symbol, first_date, last_date, now, environ=None):
     comparing the current time to the result of os.path.getmtime on the cache
     path.
     """
+    # loader_module, filename, source = INDEX_MAPPING.get(
+    #     symbol, INDEX_MAPPING['SPY'],
+    # )
+
     loader_module, filename, source = INDEX_MAPPING.get(
-        symbol, INDEX_MAPPING['SPY'],
+        symbol, INDEX_MAPPING['CHINAT'],
     )
+
     first_date = max(first_date, loader_module.earliest_possible_date())
 
     data = _load_cached_data(filename, first_date, last_date, now, 'treasury',

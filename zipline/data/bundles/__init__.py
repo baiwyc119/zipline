@@ -1,5 +1,7 @@
 # These imports are necessary to force module-scope register calls to happen.
 from . import quandl  # noqa
+from . import tushare_sources
+from . import astock_source
 from .core import (
     UnknownBundle,
     bundles,

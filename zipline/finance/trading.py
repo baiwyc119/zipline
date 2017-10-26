@@ -78,8 +78,8 @@ class TradingEnvironment(object):
     def __init__(
         self,
         load=None,
-        bm_symbol='SPY',
-        exchange_tz="US/Eastern",
+        bm_symbol='000001.SS',
+        exchange_tz="Asia/Shanghai",
         trading_calendar=None,
         asset_db_path=':memory:',
         future_chain_predicates=CHAIN_PREDICATES,
@@ -87,11 +87,12 @@ class TradingEnvironment(object):
     ):
 
         self.bm_symbol = bm_symbol
+
         if not load:
             load = partial(load_market_data, environ=environ)
 
         if not trading_calendar:
-            trading_calendar = get_calendar("NYSE")
+            trading_calendar = get_calendar("SHSZ")
 
         self.benchmark_returns, self.treasury_curves = load(
             trading_calendar.day,

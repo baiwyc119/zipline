@@ -180,8 +180,8 @@ def ipython_only(option):
     '--trading-calendar',
     metavar='TRADING-CALENDAR',
     type=click.Choice(default_calendar_names),
-    default='NYSE',
-    help="The calendar you want to use e.g. LSE. NYSE is the default."
+    default='SHSZ',
+    help="The calendar you want to use e.g. LSE. SHSZ is the default."
 )
 @click.option(
     '--print-algo/--no-print-algo',

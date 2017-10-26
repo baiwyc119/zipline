@@ -19,6 +19,9 @@ import numpy as np
 import pandas as pd
 
 
+DONWLOAD_URL = "http://yield.chinabond.com.cn/cbweb-mn/yc/downYearBzqx?year=%s&&wrjxCBFlag=0&&zblx=txy&ycDefId=%s"
+YIELD_MAIN_URL = 'http://yield.chinabond.com.cn/cbweb-mn/yield_main'
+
 get_unit_and_periods = itemgetter('unit', 'periods')
 
 

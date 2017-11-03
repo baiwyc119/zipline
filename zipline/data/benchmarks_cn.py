@@ -1,3 +1,5 @@
+#coding=utf8
+
 from zipline.utils.calendars import get_calendar
 import tushare as ts
 
@@ -7,15 +9,18 @@ def get_benchmark_returns(symbol, start_date, end_date):
     Returns a Series with returns from (start_date, end_date].
     start_date is **not** included because we need the close from day N - 1 to
     compute the returns for day N.
+    时间段这里尽量只需要短时间的数据，长时间会有问题
     """
 
     print("benchmark_cn symbol is %s"%symbol)
+    print start_date, end_date
 
-    if symbol == "^GSPC":
-        symbol = "spy"
 
     #print(symbol, start_date, end_date)
     # benchmark_frame = web.DataReader(symbol, 'google', start_date, end_date).sort_index()
+
+    cons = ts.get_apis()
+
 
     benchmark_frame = ts.get_h_data(
         symbol,

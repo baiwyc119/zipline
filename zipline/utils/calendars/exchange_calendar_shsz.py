@@ -14,9 +14,7 @@ import pandas as pd
 lunch_break_start = time(11, 30)
 lunch_break_end = time(13, 1)
 
-# start_default = pd.Timestamp('1990-12-19', tz='UTC')
-#for data reason ,change the start date to 1990-12-20
-start_default = pd.Timestamp('1990-12-20', tz='UTC')
+start_default = pd.Timestamp('1990-12-19', tz='UTC')
 end_base = pd.Timestamp('today', tz='UTC')
 end_default = end_base + pd.Timedelta(days=365)
 

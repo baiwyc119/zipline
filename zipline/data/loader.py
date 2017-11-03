@@ -88,7 +88,6 @@ def has_data_for_dates(series_or_df, first_date, last_date):
     """
     dts = series_or_df.index
 
-    print dts
     if not isinstance(dts, pd.DatetimeIndex):
         raise TypeError("Expected a DatetimeIndex, but got %s." % type(dts))
     first, last = dts[[0, -1]]
@@ -213,7 +212,6 @@ def ensure_benchmark_data(symbol, first_date, last_date, now, trading_day,
     """
     filename = get_benchmark_filename(symbol)
 
-    print filename
     data = _load_cached_data(filename, first_date, last_date, now, 'benchmark',
                              environ)
     if data is not None:
@@ -230,20 +228,13 @@ def ensure_benchmark_data(symbol, first_date, last_date, now, trading_day,
     )
 
     try:
-        if (symbol == '000001.SS') :
-            data = benchmarks_cn.get_benchmark_returns(
-                symbol,
-                first_date - trading_day,
-                last_date,
-            )
-            data.to_csv(get_data_filepath(filename, environ))
-        else :
-            data = benchmarks.get_benchmark_returns(
-                symbol,
-                first_date - trading_day,
-                last_date,
-            )
-            data.to_csv(get_data_filepath(filename, environ))
+        #just deal astock data
+        data = benchmarks_cn.get_benchmark_returns(
+            symbol,
+            first_date - trading_day,
+            last_date,
+        )
+        data.to_csv(get_data_filepath(filename, environ))
 
     except (OSError, IOError, HTTPError):
         logger.exception('Failed to cache the new benchmark returns')

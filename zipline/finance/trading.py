@@ -78,7 +78,7 @@ class TradingEnvironment(object):
     def __init__(
         self,
         load=None,
-        bm_symbol='000001.SS',
+        bm_symbol='000300',
         exchange_tz="Asia/Shanghai",
         trading_calendar=None,
         asset_db_path=':memory:',
@@ -104,9 +104,13 @@ class TradingEnvironment(object):
 
         if isinstance(asset_db_path, string_types):
             asset_db_path = 'sqlite:///' + asset_db_path
+            asset_db_path = asset_db_path + '?charset=utf8'
             self.engine = engine = create_engine(asset_db_path)
+
+            self.engine.raw_connection().connection.text_factory = str
         else:
             self.engine = engine = asset_db_path
+
 
         if engine is not None:
             AssetDBWriter(engine).init_db()

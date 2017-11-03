@@ -5,6 +5,12 @@ import pandas as pd
 import os
 from . import core as bundles
 
+import sys
+defaultencoding = 'utf-8'
+if sys.getdefaultencoding() != defaultencoding:
+    reload(sys)
+    sys.setdefaultencoding(defaultencoding)
+
 # from .squant_source import load_splits_and_dividends, zipline_splits_and_dividends
 
 """
@@ -42,9 +48,16 @@ def tushare_bundle(environ,
                   show_progress,
                   output_dir):
 
+    print  start_session, end_session
+
     metadata, histories, symbol_map = get_basic_info()
     # 写入股票基础信息
     asset_db_writer.write(metadata)
+
+
+    print histories,symbol_map,start_session,end_session
+    print get_hist_data(symbol_map, histories, start_session, end_session)
+
     # 准备写入dailybar
     daily_bar_writer.write(get_hist_data(symbol_map, histories, start_session, end_session), show_progress=show_progress)
     # 送股,分红数据, 从squant 获取
@@ -71,7 +84,7 @@ def get_basic_info(show_progress=True):
     total = len(ts_symbols)
     for index, row in ts_symbols.iterrows():
         i = i +1
-        if i > 10:
+        if i > 1:
             break
 
         srow = {}
@@ -82,9 +95,14 @@ def get_basic_info(show_progress=True):
         srow['end_date'] = histories[index].index[0]
         srow['symbol'] = index
         srow['asset_name'] = row['name']
+        print srow['asset_name']
         symbols.append(srow)
 
+    print symbols
+
     df_symbols = pd.DataFrame(data=symbols).sort_values('symbol')
+
+    df_symbols['asset_name'].apply(lambda x: unicode(x, 'utf-8'))
 
     print("symbol is ：" + df_symbols)
 
@@ -93,6 +111,7 @@ def get_basic_info(show_progress=True):
     # fix the symbol exchange info
     df = df_symbols.apply(func=convert_symbol_series, axis=1)
 
+    print df
 
     return df, histories, symbol_map
 
@@ -100,9 +119,9 @@ def get_basic_info(show_progress=True):
 def symbol_to_exchange(symbol):
     isymbol = int(symbol)
     if (isymbol>=600000):
-        return symbol + ".SS", "SSE"
+        return symbol, "SSE"
     else:
-        return symbol + ".SZ", "SZSE"
+        return symbol, "SZSE"
 
 def convert_symbol_series(s):
     symbol, e = symbol_to_exchange(s['symbol'])

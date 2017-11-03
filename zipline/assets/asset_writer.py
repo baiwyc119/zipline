@@ -1,3 +1,4 @@
+#encoding:  utf-8
 #
 # Copyright 2015 Quantopian, Inc.
 #
@@ -516,6 +517,10 @@ class AssetDBWriter(object):
         idx=True,
         idx_label=None,
     ):
+
+        print txn.connection
+        txn.connection.connection.text_factory = str
+        print tbl.name
         df.to_sql(
             tbl.name,
             txn.connection,
@@ -587,6 +592,11 @@ class AssetDBWriter(object):
             True if any tables are present, otherwise False.
         """
         conn = txn.connect()
+        conn.text_factory = str
+
+
+        print 'this do connect '
+
         for table_name in asset_db_table_names:
             if txn.dialect.has_table(conn, table_name):
                 return True
